@@ -1,9 +1,20 @@
 const user = require('../project_model/user_model.js')
+const bcrypt = require('bcryptjs')
 
 //ADD USER
 const addUser = async (req, res) => {
   try {
-    const user_list = await user.create(req.body);
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(req.body.password, salt)
+    
+    const userData = {
+      username: req.body.username,
+      email: req.body.email,
+      password: hashedPassword,
+      image: req.body.image
+    }
+    
+    const user_list = await user.create(userData);
     res
       .status(200)
       .json({ successful: true, message: "Succesfully Added User" });
@@ -35,14 +46,21 @@ const deleteUser =  async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const update = await user.findByIdAndUpdate(id, req.body);
+    let updateData = {...req.body}
+    
+    // If password is being updated, hash it first
+    if(req.body.password){
+      const salt = await bcrypt.genSalt(10)
+      updateData.password = await bcrypt.hash(req.body.password, salt)
+    }
+    
+    const update = await user.findByIdAndUpdate(id, updateData, {new: true});
     if (!update) {
       return res
         .status(404)
         .json({ succesfull: false, message: "Unable to Update " });
     }
-    const updated_user= await user.findById(id)
-    return res.status(200).json(updated_user);
+    return res.status(200).json(update);
   } catch (error) {
     res.status(404).json({ succesfull: false, message: error.message });
   }

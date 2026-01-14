@@ -1,10 +1,19 @@
 const admin = require('../project_model/admin_model.js')
-
+const bcrypt = require('bcryptjs')
 
 //  ADD ADMIN
 const addAdmin =  async (req, res)=>{
     try {
-        const add_admin = await admin.create(req.body)
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(req.body.password, salt)
+
+        const user_data = {
+          username: req.body.username,
+          user_type: req.body.user_type,
+          email: req.body.email,
+          password: hashedPassword
+        }
+        const add_admin = await admin.create(user_data)
         if(!add_admin){
             return res.status(400).json({successfull:false, message: "Unable To Add Admin"})
         }
@@ -18,12 +27,19 @@ const addAdmin =  async (req, res)=>{
 const updateAdmin =  async(req, res)=>{
   try {
     const {id} = req.params
-    const updateAdmin = await admin.findByIdAndUpdate(id, req.body)
+    let updateData = {...req.body}
+    
+    // If password is being updated, hash it first
+    if(req.body.password){
+      const salt = await bcrypt.genSalt(10)
+      updateData.password = await bcrypt.hash(req.body.password, salt)
+    }
+    
+    const updateAdmin = await admin.findByIdAndUpdate(id, updateData, {new: true})
     if(!updateAdmin){
        return res.status(400).json({successfull:false, message: "Unable To Update Admin"})
     }
-    const updatedAdmin = await admin.findById(id)
-    return res.status(200).json(updatedAdmin)
+    return res.status(200).json(updateAdmin)
   } catch (error) {
     res.status(400).json({successfull: false, message: error.message})
   }
