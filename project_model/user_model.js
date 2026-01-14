@@ -15,6 +15,10 @@ const userSchema = mongoose.Schema(
         password:{
             type: String,
             required:[true, "Please Enter Your Password"]
+        },
+         image:{
+            type: String,
+            required:[false]
         }
     },
    {timestamps: true}

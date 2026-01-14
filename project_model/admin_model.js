@@ -18,7 +18,8 @@ const adminSchema = mongoose.Schema(
         password:{
             type: String,
             required:[true, "Please Enter Your Password"]
-        }   
+        }  ,
+       
     },
     {timestamps: true}
 )
