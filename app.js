@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-
+require('dotenv').config()
 
 const user_router = require("./routes/userRoutes.js");
 const admin_router = require("./routes/adminRouter.js");
@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 });
 mongoose
   .connect(
-    "mongodb+srv://amitdb:NmUicO0b3fiUAyzB@databaseapi.ltqn5l0.mongodb.net/?appName=databaseapi"
+    process.env.DATABASE_URL
   )
   .then(() => {
     console.log("Connected to Database");
