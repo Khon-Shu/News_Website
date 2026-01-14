@@ -12,7 +12,7 @@ const message_router = require('./routes/messageRouter.js')
 app.use(express.json());
 
 //TO GET DATA (FORM FORMAT)
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 //ROUTER FOR USER HANDLING
 app.use("/users/api", user_router);
@@ -23,10 +23,10 @@ app.use("/admin/api", admin_router);
 
 
 //ROUTER FOR MESSAGE HANDLING
-app.use("/message/api", admin_router);
+app.use("/message/api", message_router);
 
 app.get("/", (req, res) => {
-  app.send("This is homepage");
+  res.send("This is homepage");
 });
 mongoose
   .connect(

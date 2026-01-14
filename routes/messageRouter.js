@@ -8,15 +8,20 @@ const {
   deleteMessage,
   addMessage,
 } = require("../controller/message_controller.js");
+
 //GET MESSAGES
-message_router.get("/message/api", fetchMessage);
+message_router.get("/", fetchMessage);
 
 //POST MESSAGE
-message_router.post("/message/api", addMessage);
-//DELETE MESSAGE
-message_router.delete("/message/api/:id", deleteMessage);
+message_router.post("/", addMessage);
+
+//GET MESSAGE BY ID
+message_router.get("/:id", fetchMessageById);
 
 //UPDATE MESSAGE
-message_router.put("/message/api/:id", updateMessage);
-//GET MESSAGE BY ID
-message_router.get("/messages/api/:id", fetchMessageById);
+message_router.put("/:id", updateMessage);
+
+//DELETE MESSAGE
+message_router.delete("/:id", deleteMessage);
+
+module.exports = message_router;

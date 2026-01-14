@@ -7,8 +7,8 @@ const addUser = async (req, res) => {
     res
       .status(200)
       .json({ successful: true, message: "Succesfully Added User" });
-  } catch (err) {
-    res.status(404).json({ successful: false, message:  error.message });
+  } catch (error) {
+    res.status(404).json({ successful: false, message: error.message });
   }
 }
 
@@ -70,12 +70,12 @@ const getUserById =  async (req, res) => {
 const getAllUser = async (req, res) => {
   try {
     const users_list = await user.find({});
-    res.status(200).json(users_list);
-    if (!users_list) {
+    if (!users_list || users_list.length === 0) {
       return res
         .status(404)
         .json({ successful: false, message: "Unable To Find User" });
     }
+    return res.status(200).json(users_list);
   } catch (error) {
     res.status(404).json({ successful: false, message: error.message });
   }

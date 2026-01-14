@@ -18,14 +18,13 @@ const addMessage =async (req, res) => {
 const updateMessage =async (req, res) => {
   try {
     const { id } = req.params;
-    const update_message = await message_model.findByIdAndDelete(id, req.body);
+    const update_message = await message_model.findByIdAndUpdate(id, req.body, { new: true });
     if (!update_message) {
       return res
         .status(400)
         .json({ succesfull: false, message: "Failed To Update Message" });
     }
-    const updated_message = await message_model.findById(id);
-    return res.status(200).json(updated_message);
+    return res.status(200).json(update_message);
   } catch (error) {
     res.status(400).json({ succesfull: false, message: error.message });
   }
@@ -68,12 +67,8 @@ const fetchMessageById = async (req, res) => {
 //FETCH MESSAGE
 const fetchMessage =async (req, res) => {
   try {
-    const fetched_messages = await message_model.find({});
-    if (!fetched_messages) {
-      return res
-        .status(400)
-        .json({ succesfull: false, message: "Couldn't Find Any Messages" });
-    }
+    const fetched_messages = await message_model.find({}).populate('user');
+    return res.status(200).json(fetched_messages);
   } catch (error) {
     res.status(400).json({ succesfull: false, message: error.message });
   }
