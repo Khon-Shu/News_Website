@@ -12,21 +12,104 @@
             <div class="logo">
                 <h1>📰 News Hub</h1>
             </div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/login.html">Login</a></li>
-                <li><a href="/register.html">Register</a></li>
-            </ul>
+            
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search news...">
+                <button class="search-btn">🔍</button>
+            </div>
+            
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                </ul>
+                <div class="profile-section">
+                    <button class="profile-btn">👤 Profile</button>
+                    <button class="login-btn">Login</button>
+                </div>
+            </div>
         </nav>
     </header>
 
     <main>
         <div class="hero-section">
-            <h2>Latest News</h2>
-            <p>Stay updated with the latest headlines</p>
+            <div class="hero-content">
+                <h2>Stay Informed, Stay Ahead</h2>
+                <p>Your trusted source for breaking news and in-depth analysis</p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">Articles</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Sources</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Updates</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- Categories Section -->
+        <section class="categories-section">
+            <h3>Browse by Category</h3>
+            <div class="categories-grid">
+                <div class="category-card" data-category="technology">
+                    <div class="category-icon">💻</div>
+                    <h4>Technology</h4>
+                    <span class="category-count">245 articles</span>
+                </div>
+                <div class="category-card" data-category="business">
+                    <div class="category-icon">💼</div>
+                    <h4>Business</h4>
+                    <span class="category-count">189 articles</span>
+                </div>
+                <div class="category-card" data-category="sports">
+                    <div class="category-icon">⚽</div>
+                    <h4>Sports</h4>
+                    <span class="category-count">312 articles</span>
+                </div>
+                <div class="category-card" data-category="entertainment">
+                    <div class="category-icon">🎬</div>
+                    <h4>Entertainment</h4>
+                    <span class="category-count">278 articles</span>
+                </div>
+                <div class="category-card" data-category="health">
+                    <div class="category-icon">🏥</div>
+                    <h4>Health</h4>
+                    <span class="category-count">156 articles</span>
+                </div>
+                <div class="category-card" data-category="science">
+                    <div class="category-icon">🔬</div>
+                    <h4>Science</h4>
+                    <span class="category-count">134 articles</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trending Topics -->
+        <section class="trending-section">
+            <h3>🔥 Trending Now</h3>
+            <div class="trending-topics">
+                <div class="trending-tag">#AIRevolution</div>
+                <div class="trending-tag">#ClimateAction</div>
+                <div class="trending-tag">#SpaceExploration</div>
+                <div class="trending-tag">#GlobalMarkets</div>
+                <div class="trending-tag">#TechInnovation</div>
+            </div>
+        </section>
+
         <div class="news-container">
+            <div class="section-header">
+                <h3>Latest News</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="breaking">Breaking</button>
+                    <button class="filter-btn" data-filter="popular">Popular</button>
+                </div>
+            </div>
             <div class="loading" id="loading">Loading news...</div>
             <div class="news-grid" id="newsGrid">
                 <!-- News articles will be loaded here by JavaScript -->
