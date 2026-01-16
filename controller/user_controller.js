@@ -1,7 +1,35 @@
 const user = require("../project_model/user_model.js");
 const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const path = require("path");
 
-//ADD USER
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: function (req, file, cb) {
+    // Allow only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'), false);
+    }
+  }
+});
+
+//ADD USER with image upload
 const addUser = async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
@@ -11,13 +39,13 @@ const addUser = async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
-      image: req.body.image,
+      image: req.file ? `/uploads/${req.file.filename}` : null,
     };
 
     const user_list = await user.create(userData);
     res
       .status(200)
-      .json({ successful: true, message: "Succesfully Added User" });
+      .json({ successful: true, message: "Successfully Added User", user: user_list });
   } catch (error) {
     res.status(404).json({ successful: false, message: error.message });
   }
@@ -46,10 +74,20 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    let updateData = { ...req.body };
+    let updateData = {};
+
+    // Handle form data (for file uploads)
+    if (req.body) {
+      updateData = { ...req.body };
+    }
+
+    // Handle file upload
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
 
     // If password is being updated, hash it first
-    if (req.body.password) {
+    if (req.body && req.body.password) {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(req.body.password, salt);
     }
@@ -58,11 +96,13 @@ const updateUser = async (req, res) => {
     if (!update) {
       return res
         .status(404)
-        .json({ succesfull: false, message: "Unable to Update " });
+        .json({ successful: false, message: "Unable to update user" });
     }
-    return res.status(200).json(update);
+    return res
+      .status(200)
+      .json({ successful: true, message: "User updated successfully", data: update });
   } catch (error) {
-    res.status(404).json({ succesfull: false, message: error.message });
+    res.status(400).json({ successful: false, message: error.message });
   }
 };
 
@@ -88,12 +128,12 @@ const getAllUser = async (req, res) => {
     const users_list = await user.find({});
     if (!users_list || users_list.length === 0) {
       return res
-        .status(404)
-        .json({ successful: false, message: "Unable To Find User" });
+        .status(200)
+        .json({ successful: true, message: "No users found", data: [] });
     }
-    return res.status(200).json(users_list);
+    return res.status(200).json({ successful: true, message: "Users found", data: users_list });
   } catch (error) {
-    res.status(404).json({ successful: false, message: error.message });
+    res.status(400).json({ successful: false, message: error.message });
   }
 };
 
@@ -105,13 +145,13 @@ const loginUser = async (req, res) => {
     if (!found_email) {
       return res
         .status(400)
-        .json({ succesfull: false, message: "Email Not Found" });
+        .json({ successful: false, message: "Email Not Found" });
     }
     const isPasswordMatch = await bcrypt.compare(password,found_email.password)
     if(!isPasswordMatch){
        return res
         .status(400)
-        .json({ succesfull: false, message: "Password Don't Match" });
+        .json({ successful: false, message: "Password Don't Match" });
     }
     const userData ={
       id: found_email._id,
@@ -125,8 +165,8 @@ const loginUser = async (req, res) => {
       user: userData
     });
   } catch (error) {
-    res.status(400).json({ succesfull: false, message: "Unable to Find User" });
+    res.status(400).json({ successful: false, message: "Unable to Find User" });
   }
 };
 
-module.exports = { getUserById, addUser, deleteUser, updateUser, getAllUser, loginUser };
+module.exports = { getUserById, addUser, deleteUser, updateUser, getAllUser, loginUser, upload };

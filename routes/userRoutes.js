@@ -6,23 +6,24 @@ const {
   deleteUser,
   updateUser,
   getAllUser,
-  loginUser
+  loginUser,
+  upload
 } = require("../controller/user_controller.js");
-
 
 //LOGIN USER
 user_router.post('/login', loginUser)
+
 //get all user
 user_router.get("/", getAllUser);
 
-// ADD NEW USER
-user_router.post("/", addUser);
+// ADD NEW USER with image upload
+user_router.post("/", upload.single('image'), addUser);
 
 //FETCH USER BY ID
 user_router.get("/:id", getUserById);
 
-//UPDATE USER
-user_router.put("/:id", updateUser);
+//UPDATE USER with image upload support
+user_router.put("/:id", upload.single('image'), updateUser);
 
 //DELETE USER
 user_router.delete("/:id", deleteUser);

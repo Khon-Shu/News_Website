@@ -77,11 +77,11 @@ async function loadDashboardStats() {
         
         // Update statistics
         document.getElementById('totalUsers').textContent = 
-            usersData.successful ? usersData.length || 0 : 0;
+            usersData.successful && usersData.data ? usersData.data.length : 0;
         document.getElementById('totalAdmins').textContent = 
-            adminsData.successful ? adminsData.length || 0 : 0;
+            adminsData.successful && adminsData.data ? adminsData.data.length : 0;
         document.getElementById('totalMessages').textContent = 
-            messagesData.successful ? messagesData.length || 0 : 0;
+            messagesData.successful && messagesData.data ? messagesData.data.length : 0;
         
         // Get today's news count
         const newsResponse = await fetch(API_BASE + '/news/api');
@@ -104,8 +104,8 @@ async function loadUsers() {
         const tbody = document.getElementById('usersTableBody');
         tbody.innerHTML = '';
         
-        if (data.successful && Array.isArray(data)) {
-            data.forEach(user => {
+        if (data.successful && data.data && Array.isArray(data.data)) {
+            data.data.forEach(user => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${user._id || 'N/A'}</td>
@@ -136,12 +136,12 @@ async function loadAdmins() {
         const tbody = document.getElementById('adminsTableBody');
         tbody.innerHTML = '';
         
-        if (data.successful && Array.isArray(data)) {
-            data.forEach(admin => {
+        if (data.successful && data.data && Array.isArray(data.data)) {
+            data.data.forEach(admin => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${admin._id || 'N/A'}</td>
-                    <td>${admin.name || 'N/A'}</td>
+                    <td>${admin.username || 'N/A'}</td>
                     <td>${admin.email || 'N/A'}</td>
                     <td>
                         <button class="action-btn" onclick="editAdmin('${admin._id}')">Edit</button>
@@ -168,8 +168,8 @@ async function loadMessages() {
         const tbody = document.getElementById('messagesTableBody');
         tbody.innerHTML = '';
         
-        if (data.successful && Array.isArray(data)) {
-            data.forEach(message => {
+        if (data.successful && data.data && Array.isArray(data.data)) {
+            data.data.forEach(message => {
                 const row = document.createElement('tr');
                 const messageText = message.message ? 
                     (message.message.length > 50 ? message.message.substring(0, 50) + '...' : message.message) 
@@ -177,21 +177,51 @@ async function loadMessages() {
                 const date = message.createdAt ? 
                     new Date(message.createdAt).toLocaleDateString() : 'N/A';
                 
+                // Type badge styling
+                const typeColors = {
+                    'feedback': '#27ae60',
+                    'contact': '#3498db',
+                    'complaint': '#e74c3c',
+                    'suggestion': '#f39c12'
+                };
+                
+                const typeColor = typeColors[message.type] || '#667eea';
+                
+                // Status badge styling
+                const statusColors = {
+                    'pending': '#f39c12',
+                    'read': '#3498db',
+                    'resolved': '#27ae60'
+                };
+                
+                const statusColor = statusColors[message.status] || '#f39c12';
+                
                 row.innerHTML = `
                     <td>${message._id || 'N/A'}</td>
                     <td>${message.name || 'N/A'}</td>
                     <td>${message.email || 'N/A'}</td>
+                    <td>
+                        <span style="background: ${typeColor}20; color: ${typeColor}; padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem; font-weight: 600;">
+                            ${message.type || 'feedback'}
+                        </span>
+                    </td>
                     <td>${messageText}</td>
                     <td>${date}</td>
                     <td>
+                        <span style="background: ${statusColor}20; color: ${statusColor}; padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.8rem; font-weight: 600;">
+                            ${message.status || 'pending'}
+                        </span>
+                    </td>
+                    <td>
                         <button class="action-btn" onclick="viewMessage('${message._id}')">View</button>
+                        <button class="action-btn" onclick="markAsRead('${message._id}')">Mark Read</button>
                         <button class="action-btn danger" onclick="deleteMessage('${message._id}')">Delete</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
         } else {
-            tbody.innerHTML = '<tr><td colspan="6">No messages found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8">No messages found</td></tr>';
         }
     } catch (error) {
         console.error('Error loading messages:', error);
@@ -277,6 +307,31 @@ async function deleteMessage(messageId) {
     } catch (error) {
         console.error('Error deleting message:', error);
         showNotification('Error deleting message', 'error');
+    }
+}
+
+// Mark message as read
+async function markAsRead(messageId) {
+    try {
+        const response = await fetch(API_BASE + `/message/api/${messageId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: 'read' })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showNotification('Message marked as read', 'success');
+            loadMessages();
+        } else {
+            showNotification(data.message || 'Error updating message', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating message:', error);
+        showNotification('Error updating message', 'error');
     }
 }
 

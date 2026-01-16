@@ -91,7 +91,23 @@ function updateUIForAuth() {
     if (state.currentUser) {
         loginBtn.textContent = 'Logout';
         loginBtn.onclick = logout;
-        profileBtn.textContent = state.currentUser.username || state.currentUser.email || 'Profile';
+        
+        // Show user profile image if available
+        if (state.currentUser.image) {
+            profileBtn.innerHTML = `<img src="${state.currentUser.image}" alt="Profile" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; margin-right: 8px;">Profile`;
+        } else {
+            profileBtn.innerHTML = `👤 Profile`;
+        }
+        
+        // Make profile button clickable
+        profileBtn.style.cursor = 'pointer';
+        profileBtn.onclick = () => {
+            if (state.isAdmin) {
+                window.location.href = '/admin.html';
+            } else {
+                window.location.href = '/profile.html';
+            }
+        };
         
         if (state.isAdmin) {
             profileBtn.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
@@ -103,6 +119,9 @@ function updateUIForAuth() {
         profileBtn.textContent = '👤 Profile';
         profileBtn.style.background = '';
         profileBtn.style.color = '';
+        profileBtn.onclick = () => {
+            showNotification('Please login first', 'warning');
+        };
     }
 }
 
@@ -353,6 +372,18 @@ function showNotification(message, type = 'info') {
 
 // Initialize event listeners
 function initializeEventListeners() {
+    // Login button functionality
+    const loginBtn = document.querySelector('.login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            if (state.currentUser) {
+                logout();
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+    }
+    
     // Search functionality
     const searchBtn = document.querySelector('.search-btn');
     const searchBar = document.querySelector('.search-bar');

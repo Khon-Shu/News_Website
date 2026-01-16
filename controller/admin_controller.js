@@ -71,14 +71,14 @@ const getAdminById = async (req, res) => {
 const getAdmin = async (req, res) => {
   try {
     const total_admin = await admin.find({});
-    if (!total_admin) {
+    if (!total_admin || total_admin.length === 0) {
       return res
-        .status(400)
-        .json({ successfull: false, message: "Unable to find admin" });
+        .status(200)
+        .json({ successful: true, message: "No admins found", data: [] });
     }
-    return res.status(200).json(total_admin);
+    return res.status(200).json({ successful: true, message: "Admins found", data: total_admin });
   } catch (error) {
-    res.status(400).json({ successfull: false, message: error.message });
+    res.status(400).json({ successful: false, message: error.message });
   }
 };
 
@@ -108,7 +108,7 @@ const loginAdmin = async (req, res) => {
     if (!found_admin) {
       return res
         .status(400)
-        .json({ successfull: false, message: "Please give valid email" });
+        .json({ successful: false, message: "Please give valid email" });
     }
 
       //CHECK IF THE PASSWORD MATCHES
@@ -120,7 +120,7 @@ const loginAdmin = async (req, res) => {
       if (!isPasswordMatch) {
         return res
           .status(400)
-          .json({ successfull: false, message: "Password Incorrect" });
+          .json({ successful: false, message: "Password Incorrect" });
       }
 
       const adminData = {
@@ -133,13 +133,13 @@ const loginAdmin = async (req, res) => {
       return res
         .status(200)
         .json({
-          successfull: true,
-          message: "Login Succesful",
-          data: adminData,
+          successful: true,
+          message: "Login Successful",
+          user: adminData,
         });
     
   } catch (error) {
-    res.status(400).json({successfull: false, message: error.message})
+    res.status(400).json({successful: false, message: error.message})
   }
 };
 module.exports = { getAdmin, getAdminById, deleteAdmin, updateAdmin, addAdmin , loginAdmin};

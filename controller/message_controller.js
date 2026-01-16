@@ -3,15 +3,32 @@ const message_model = require('../project_model/message_model.js')
 //ADD NEW MESSAGE
 const addMessage =async (req, res) => {
   try {
-    const messages = await message_model.create(req.body);
+    // If user is logged in, add user ID to message
+    const messageData = {
+      name: req.body.name,
+      email: req.body.email,
+      message: req.body.message,
+      type: req.body.type || 'feedback'
+    };
+    
+    // Add user ID if available (for logged-in users)
+    if (req.body.user || req.user) {
+      messageData.user = req.body.user || req.user.id;
+    }
+    
+    const messages = await message_model.create(messageData);
     if (!messages) {
       return res
         .status(400)
-        .json({ succesfull: false, message: "Failed To Deliver Message" });
+        .json({ successful: false, message: "Failed To Deliver Message" });
     }
-    return res.status(200).json(messages);
+    return res.status(200).json({ 
+      successful: true, 
+      message: "Message sent successfully!",
+      data: messages 
+    });
   } catch (error) {
-    res.status(400).json({ succesfull: false, message: error.message });
+    res.status(400).json({ successful: false, message: error.message });
   }
 }
 //UPDATE THE MESSAGE
@@ -67,10 +84,14 @@ const fetchMessageById = async (req, res) => {
 //FETCH MESSAGE
 const fetchMessage =async (req, res) => {
   try {
-    const fetched_messages = await message_model.find({}).populate('user');
-    return res.status(200).json(fetched_messages);
+    const fetched_messages = await message_model.find({}).sort({ createdAt: -1 });
+    return res.status(200).json({ 
+      successful: true, 
+      message: "Messages fetched successfully",
+      data: fetched_messages 
+    });
   } catch (error) {
-    res.status(400).json({ succesfull: false, message: error.message });
+    res.status(400).json({ successful: false, message: error.message });
   }
 }
 

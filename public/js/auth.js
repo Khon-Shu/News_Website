@@ -135,6 +135,7 @@ async function handleRegister(event) {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
+    const imageFile = document.getElementById('image').files[0];
     
     // Validation
     if (!username) {
@@ -172,16 +173,35 @@ async function handleRegister(event) {
         return;
     }
     
+    // Validate image if provided
+    if (imageFile) {
+        if (!imageFile.type.startsWith('image/')) {
+            showMessage('Please select a valid image file');
+            return;
+        }
+        
+        if (imageFile.size > 5 * 1024 * 1024) { // 5MB
+            showMessage('Image size must be less than 5MB');
+            return;
+        }
+    }
+    
     setLoading(true);
     showMessage('', 'success'); // Clear messages
     
     try {
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('email', email);
+        formData.append('password', password);
+        
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+        
         const response = await fetch(API_BASE + '/users/api', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, email, password })
+            body: formData // Don't set Content-Type header, let browser set it for FormData
         });
         
         const data = await response.json();
@@ -191,6 +211,7 @@ async function handleRegister(event) {
             
             // Clear form
             document.getElementById('registerForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
             
             // Redirect to login after 2 seconds
             setTimeout(() => {
@@ -271,6 +292,42 @@ function enhanceFormInputs() {
                 confirmPasswordInput.style.borderColor = '#e74c3c';
             } else {
                 confirmPasswordInput.style.borderColor = '';
+            }
+        });
+    }
+    
+    // Image preview functionality
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            
+            if (file) {
+                // Validate file
+                if (!file.type.startsWith('image/')) {
+                    showMessage('Please select a valid image file');
+                    imageInput.value = '';
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) { // 5MB
+                    showMessage('Image size must be less than 5MB');
+                    imageInput.value = '';
+                    return;
+                }
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewImg = imagePreview.querySelector('img');
+                    previewImg.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.style.display = 'none';
             }
         });
     }

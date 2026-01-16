@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - News Website</title>
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/contact.css">
+</head>
+<body>
+    <div class="contact-container">
+        <a href="/" class="back-home">← Back to Home</a>
+        
+        <div class="contact-card">
+            <div class="contact-header">
+                <h1>Contact Us</h1>
+                <p>We'd love to hear from you!</p>
+            </div>
+            
+            <div class="contact-info">
+                <h3>Get in Touch</h3>
+                <p>📧 Email: support@newshub.com</p>
+                <p>📞 Phone: +977 9863252012</p>
+                <p>📍 Address: Sitapaila, KTM</p>
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+            
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Your Name *</label>
+                    <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="type">Feedback Type *</label>
+                    <select id="type" name="type" required>
+                        <option value="">Select feedback type</option>
+                        <option value="feedback">General Feedback</option>
+                        <option value="contact">Contact Request</option>
+                        <option value="complaint">Complaint</option>
+                        <option value="suggestion">Suggestion</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Your Message *</label>
+                    <textarea id="message" name="message" required placeholder="Tell us what's on your mind..." maxlength="500"></textarea>
+                    <div class="char-counter">
+                        <span id="charCount">0</span> / 500 characters
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span id="btnText">Send Message</span>
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="/js/contact.js"></script>
+</body>
+</html>
